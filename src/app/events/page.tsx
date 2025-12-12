@@ -15,7 +15,8 @@ export default function EventsPage() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setEvents(await res.json());
     } catch (e) {
-      setError(e?.message ?? "Unknown error");
+      const msg = e instanceof Error ? e.message : "Unknown error";
+      setError(msg);
     } finally {
       setLoading(false);
     }
