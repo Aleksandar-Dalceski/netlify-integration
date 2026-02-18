@@ -13,6 +13,23 @@ export default function SitesPage() {
   const [sites, setSites] = useState<NetlifySite[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  const DEMO_SITES = [
+    { id: "1", name: "Demo Site A", ssl_url: "https://demo-a.netlify.app" },
+    { id: "2", name: "Demo Site B", ssl_url: "https://demo-b.netlify.app" },
+    { id: "3", name: "Demo Site C", ssl_url: "https://demo-c.netlify.app" },
+  ];
+
+  useEffect(() => {
+    (async () => {
+      const res = await fetch("/api/netlify/sites", { cache: "no-store" });
+      if (!res.ok) {
+        setSites(DEMO_SITES); // 👈 fallback seed data
+        return;
+      }
+      setSites(await res.json());
+    })();
+  }, []);
+
   useEffect(() => {
     (async () => {
       const res = await fetch("/api/netlify/sites", { cache: "no-store" });
