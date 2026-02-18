@@ -12,17 +12,11 @@ type NetlifySite = {
 export default function SitesPage() {
   const [sites, setSites] = useState<NetlifySite[]>([]);
   const [error, setError] = useState<string | null>(null);
-
-  const DEMO_SITES = [
-    { id: "1", name: "Demo Site A", ssl_url: "https://demo-a.netlify.app" },
-    { id: "2", name: "Demo Site B", ssl_url: "https://demo-b.netlify.app" },
-    { id: "3", name: "Demo Site C", ssl_url: "https://demo-c.netlify.app" },
-  ];
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
-        // optional timeout (8s) so it won't hang forever
         const controller = new AbortController();
         const t = setTimeout(() => controller.abort(), 8000);
 
@@ -34,30 +28,36 @@ export default function SitesPage() {
         clearTimeout(t);
 
         if (!res.ok) {
-          setSites(DEMO_SITES);
-          setError(`Using demo data (API returned ${res.status}).`);
+          setError(`Failed to load sites (${res.status})`);
+          setSites([]);
+          setLoading(false);
           return;
         }
 
         const data = (await res.json()) as NetlifySite[];
         setSites(data);
         setError(null);
-      } catch (e) {
-        setSites(DEMO_SITES);
-        setError("Using demo data (API unreachable).");
+        setLoading(false);
+      } catch {
+        setError("Failed to load sites (network error)");
+        setSites([]);
+        setLoading(false);
       }
     })();
   }, []);
 
   return (
     <main style={{ padding: 24 }}>
-      <p>Nov deploy</p>
+      <h1>Netlify Sites</h1>
+      <p>Build: sites-page-v2</p>
+
+      {loading && <p>Loading…</p>}
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {!error && sites.length === 0 ? (
-        <p>Loading…</p>
-      ) : (
+      {!loading && !error && sites.length === 0 && <p>No sites found.</p>}
+
+      {sites.length > 0 && (
         <ul>
           {sites.map((s) => (
             <li key={s.id}>
