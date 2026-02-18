@@ -49,7 +49,7 @@ export default async function SitesPage() {
       <ul>
         {sites.map((s) => (
           <li key={s.id}>
-            <strong>{s.name}</strong>{" "}
+            <strong>{s.name}</strong> <p>{s.site_id}</p>
             <a
               href={s.ssl_url ?? s.url ?? "#"}
               target="_blank"
