@@ -1,35 +1,42 @@
-export const dynamic = "force-dynamic";
+"use client";
+
+import { useEffect, useState } from "react";
 
 type NetlifySite = {
   id: string;
   name: string;
-  url?: string;
   ssl_url?: string;
-  admin_url?: string;
+  url?: string;
 };
 
-async function getSites(): Promise<NetlifySite[]> {
-  const res = await fetch("/api/netlify/sites", { cache: "no-store" });
+export default function SitesPage() {
+  const [sites, setSites] = useState<NetlifySite[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!res.ok) return [];
-  return res.json();
-}
-
-export default async function SitesPage() {
-  const sites = await getSites();
+  useEffect(() => {
+    (async () => {
+      const res = await fetch("/api/netlify/sites", { cache: "no-store" });
+      if (!res.ok) {
+        setError(`Failed to load sites (${res.status})`);
+        return;
+      }
+      setSites(await res.json());
+    })();
+  }, []);
 
   return (
     <main style={{ padding: 24 }}>
       <h1>Netlify Sites</h1>
 
-      {sites.length === 0 ? (
-        <p>No sites found (or NETLIFY_TOKEN not set).</p>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {!error && sites.length === 0 ? (
+        <p>Loading…</p>
       ) : (
         <ul>
           {sites.map((s) => (
-            <li key={s.id} style={{ marginBottom: 10 }}>
-              <strong>{s.name}</strong>
-              {" — "}
+            <li key={s.id}>
+              <strong>{s.name}</strong>{" "}
               <a
                 href={s.ssl_url ?? s.url ?? "#"}
                 target="_blank"
