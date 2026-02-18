@@ -5,6 +5,7 @@ type NetlifySite = {
   name: string;
   ssl_url?: string;
   url?: string;
+  site_id?: string;
 };
 
 const DEMO_SITES: NetlifySite[] = [
