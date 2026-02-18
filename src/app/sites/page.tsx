@@ -32,6 +32,7 @@ async function getSites(): Promise<NetlifySite[]> {
       name: s.name,
       ssl_url: s.ssl_url,
       url: s.url,
+      site_id: s.site_id,
     }));
   } catch {
     return DEMO_SITES;
