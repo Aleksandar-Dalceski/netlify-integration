@@ -21,18 +21,37 @@ export default function SitesPage() {
 
   useEffect(() => {
     (async () => {
-      const res = await fetch("/api/netlify/sites", { cache: "no-store" });
-      if (!res.ok) {
-        setSites(DEMO_SITES); // 👈 fallback seed data
-        return;
+      try {
+        // optional timeout (8s) so it won't hang forever
+        const controller = new AbortController();
+        const t = setTimeout(() => controller.abort(), 8000);
+
+        const res = await fetch("/api/netlify/sites", {
+          cache: "no-store",
+          signal: controller.signal,
+        });
+
+        clearTimeout(t);
+
+        if (!res.ok) {
+          setSites(DEMO_SITES);
+          setError(`Using demo data (API returned ${res.status}).`);
+          return;
+        }
+
+        const data = (await res.json()) as NetlifySite[];
+        setSites(data);
+        setError(null);
+      } catch (e) {
+        setSites(DEMO_SITES);
+        setError("Using demo data (API unreachable).");
       }
-      setSites(await res.json());
     })();
   }, []);
 
   return (
     <main style={{ padding: 24 }}>
-      <h1>Netlify Sites</h1>
+      <p>Nov deploy</p>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
