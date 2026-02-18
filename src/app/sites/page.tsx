@@ -30,17 +30,6 @@ export default function SitesPage() {
     })();
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      const res = await fetch("/api/netlify/sites", { cache: "no-store" });
-      if (!res.ok) {
-        setError(`Failed to load sites (${res.status})`);
-        return;
-      }
-      setSites(await res.json());
-    })();
-  }, []);
-
   return (
     <main style={{ padding: 24 }}>
       <h1>Netlify Sites</h1>
